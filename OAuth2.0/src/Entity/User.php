@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -36,10 +38,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $google_id = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $avatar = null;
+    private ?string $google_avatar = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $google_name = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $avatar = null;
+
+    #[ORM\Column(length: 60)]
+    private ?string $lastname = null;
+
+    #[ORM\Column(length: 60)]
+    private ?string $firstname = null;
+
+    #[ORM\Column(length: 14)]
+    private ?string $tel = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $created_at = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $operations_finalisee = null;
+
+    #[ORM\ManyToMany(targetEntity: Address::class, inversedBy: 'users')]
+    private Collection $Address;
+
+    #[ORM\OneToMany(targetEntity: Devis::class, mappedBy: 'User')]
+    private Collection $devis;
+
+    public function __construct()
+    {
+        $this->Address = new ArrayCollection();
+        $this->devis = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -128,14 +160,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getAvatar(): ?string
+    public function getGoogleAvatar(): ?string
     {
-        return $this->avatar;
+        return $this->google_avatar;
     }
 
-    public function setAvatar(?string $avatar): static
+    public function setGoogleAvatar(?string $google_avatar): static
     {
-        $this->avatar = $avatar;
+        $this->google_avatar = $google_avatar;
 
         return $this;
     }
@@ -148,6 +180,132 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setGoogleName(?string $google_name): static
     {
         $this->google_name = $google_name;
+
+        return $this;
+    }
+
+    public function getAvatar(): ?string
+    {
+        return $this->avatar;
+    }
+
+    public function setAvatar(?string $avatar): static
+    {
+        $this->avatar = $avatar;
+
+        return $this;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->lastname;
+    }
+
+    public function setLastname(string $lastname): static
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    public function getFirstname(): ?string
+    {
+        return $this->firstname;
+    }
+
+    public function setFirstname(string $firstname): static
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    public function getTel(): ?string
+    {
+        return $this->tel;
+    }
+
+    public function setTel(string $tel): static
+    {
+        $this->tel = $tel;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    {
+        $this->created_at = $created_at;
+
+        return $this;
+    }
+
+    public function getOperationsFinalisee(): ?int
+    {
+        return $this->operations_finalisee;
+    }
+
+    public function setOperationsFinalisee(?int $operations_finalisee): static
+    {
+        $this->operations_finalisee = $operations_finalisee;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Address>
+     */
+    public function getAddress(): Collection
+    {
+        return $this->Address;
+    }
+
+    public function addAddress(Address $address): static
+    {
+        if (!$this->Address->contains($address)) {
+            $this->Address->add($address);
+        }
+
+        return $this;
+    }
+
+    public function removeAddress(Address $address): static
+    {
+        $this->Address->removeElement($address);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Devis>
+     */
+    public function getDevis(): Collection
+    {
+        return $this->devis;
+    }
+
+    public function addDevi(Devis $devi): static
+    {
+        if (!$this->devis->contains($devi)) {
+            $this->devis->add($devi);
+            $devi->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDevi(Devis $devi): static
+    {
+        if ($this->devis->removeElement($devi)) {
+            // set the owning side to null (unless already changed)
+            if ($devi->getUser() === $this) {
+                $devi->setUser(null);
+            }
+        }
 
         return $this;
     }

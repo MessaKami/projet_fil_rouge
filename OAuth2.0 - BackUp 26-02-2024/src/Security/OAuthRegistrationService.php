@@ -24,7 +24,7 @@ final readonly class OAuthRegistrationService
         $user = (new User())
         ->setEmail($resourceOwner->getEmail())
         ->setGoogleId($resourceOwner->getId())
-        ->setGoogleAvatar($resourceOwner->getAvatar())
+        ->setAvatar($resourceOwner->getAvatar())
         ->setGoogleName($resourceOwner->getName());
             
 
